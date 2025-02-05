@@ -1,0 +1,1 @@
+# zabbix-7-installation-with-MySQL-and-Nginx
