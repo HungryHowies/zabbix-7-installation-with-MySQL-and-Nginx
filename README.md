@@ -1,39 +1,72 @@
 # zabbix-7-installation-with-MySQL-and-Nginx
 
-Login as root
-
-wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-1+ubuntu22.04_all.deb
-dpkg -i zabbix-release_7.0-1+ubuntu22.04_all.deb
+```
+sudo wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-1+ubuntu22.04_all.deb
+```
+```
+sudo dpkg -i zabbix-release_7.0-1+ubuntu22.04_all.deb
+```
+```
 apt update
+```
+```
 apt install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent
+```
+```
 apt install mysql-server
+```
+```
 systemctl start mysql.service
+```
+```
 systemctl enable mysql.service
+```
+```
 mysql -uroot -p
+```
+```
 create database zabbix character set utf8mb4 collate utf8mb4_bin;
+```
+```
 create user zabbix@localhost identified by 'password';
+```
+```
 grant all privileges on zabbix.* to zabbix@localhost;
+```
+```
 set global log_bin_trust_function_creators = 1;
+```
+```
 quit;
+```
+```
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p zabbix
+```
+```
 mysql -uroot -p
+```
+```
 set global log_bin_trust_function_creators = 0;
+```
+```
 quit;
-
+```
 Edit file 
-
+```
 vi /etc/zabbix/zabbix_server.conf
-
+```
 Set password.
-
+```
 DBPassword=password
-
+```
 Save and Exit file.
 
 Certificate 
 
 Change directory.
+```
 cd /etc/zabbix
+```
 ```
 openssl req -newkey rsa:4096 \
 -x509 \
@@ -44,18 +77,20 @@ openssl req -newkey rsa:4096 \
 -keyout 192.168.200.103.key
 ```
 Edit file. 
-
+```
 vi /etc/zabbix/nginx.conf
-
+```
 Uncomment and set 'listen' and 'server_name' directives.
-
+```
 listen 8080;
 server_name 192.168.200.103;
-
+```
 Add the following line under the block called  location ~ [^/]\.php(/|$)
+```
 listen 443 ssl; # managed by me
 ssl_certificate /etc/zabbix/192.168.200.103.crt; # managed by me
 ssl_certificate_key /etc/zabbix/192.168.200.103.key; # managed by me
+```
 Example:
 ```
        location ~ [^/]\.php(/|$) {
@@ -91,12 +126,14 @@ Example:
 ```
 Save and Exit
 
-https://communityhub.nullstack.com/link/20#bkmrk-test%C2%A0-site-file
- 
 Test Site file
-
+```
 nginx -t
-
+```
 Start Zabbix server and agent processes and make it start at system boot.
+```
 systemctl restart zabbix-server zabbix-agent nginx php8.1-fpm
+```
+```
 systemctl enable zabbix-server zabbix-agent nginx php8.1-fpm
+```
