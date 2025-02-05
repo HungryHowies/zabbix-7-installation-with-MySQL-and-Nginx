@@ -1,17 +1,23 @@
 # zabbix-7-installation-with-MySQL-and-Nginx
 
+Download Zabbix repo.
+
 ```
-sudo wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-1+ubuntu22.04_all.deb
+ wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_7.0-1+ubuntu22.04_all.deb
 ```
+Install Zabbix repo.
 ```
-sudo dpkg -i zabbix-release_7.0-1+ubuntu22.04_all.deb
+ dpkg -i zabbix-release_7.0-1+ubuntu22.04_all.deb
 ```
+Update Repo.
 ```
 apt update
 ```
+Install Zabbix packages.
 ```
 apt install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent
 ```
+Install MySQL
 ```
 apt install mysql-server
 ```
@@ -21,6 +27,8 @@ systemctl start mysql.service
 ```
 systemctl enable mysql.service
 ```
+
+Create DataBase.
 ```
 mysql -uroot -p
 ```
@@ -39,6 +47,7 @@ set global log_bin_trust_function_creators = 1;
 ```
 quit;
 ```
+Install Database configurations.
 ```
 zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p zabbix
 ```
@@ -51,7 +60,7 @@ set global log_bin_trust_function_creators = 0;
 ```
 quit;
 ```
-Edit file 
+Edit Zabbix file 
 ```
 vi /etc/zabbix/zabbix_server.conf
 ```
@@ -61,12 +70,19 @@ DBPassword=password
 ```
 Save and Exit file.
 
+```
+:wq!
+```
+
 Certificate 
 
 Change directory.
+
 ```
 cd /etc/zabbix
 ```
+
+Create certificates.
 ```
 openssl req -newkey rsa:4096 \
 -x509 \
@@ -76,11 +92,12 @@ openssl req -newkey rsa:4096 \
 -out 192.168.200.103.crt \
 -keyout 192.168.200.103.key
 ```
-Edit file. 
+Edit Zabbix site file. 
 ```
 vi /etc/zabbix/nginx.conf
 ```
-Uncomment and set 'listen' and 'server_name' directives.
+Uncomment/Configure set 'listen' and 'server_name' directives.
+
 ```
 listen 8080;
 server_name 192.168.200.103;
@@ -125,12 +142,15 @@ Example:
 }
 ```
 Save and Exit
+```
+:wq!
+```
 
-Test Site file
+Test Zabbix Site file
 ```
 nginx -t
 ```
-Start Zabbix server and agent processes and make it start at system boot.
+Start Zabbix server and agent processes and enable on boot.
 ```
 systemctl restart zabbix-server zabbix-agent nginx php8.1-fpm
 ```
